@@ -20,7 +20,7 @@ export const InitialState: State = {
 export const ContextReducer = (state: State, action: Action): State => {
     switch (action.type) {
         case "Save Subscribes": {
-            return { ...state, Status: true, Data: "Suscripcion guardada" };
+            return { ...state, Status: true, Data: "Suscripciones guardadas" };
         }
         case "Get Data Subscribes": {
             return state;
