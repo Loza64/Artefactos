@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+
 type Action = {
     type: "publish message";
     payload: { status: boolean, topic: string, details: string }
@@ -9,15 +11,17 @@ interface State {
     Details: string;
 }
 
-export const ContextReducer = (state: State, action: Action): State => {
+export const InitState = { Status: false, Topic: "", Details: "" }
+
+export const Reducer = (state: State, action: Action): State => {
     switch (action.type) {
         case "publish message": {
             const { status, topic, details } = action.payload;
-            return {...state, Status: status, Topic: topic, Details: details };
+            return { ...state, Status: status, Topic: topic, Details: details };
         }
         default:
             return state;
     }
 };
 
-export default ContextReducer;
+export default Reducer;
