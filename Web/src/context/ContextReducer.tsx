@@ -1,29 +1,25 @@
-/* eslint-disable react-refresh/only-export-components */
-
-type Action =
-    | { type: "Save Subscribes"; payload: Array<string> }
-    | { type: "Get Data Subscribes"; payload: null };
+type Action = {
+    type: "publish message";
+    payload: { status: boolean, topic: string, details: string }
+};
 
 interface State {
-    Topic: string;
     Status: boolean;
-    Data: string;
+    Topic: string;
+    Details: string;
 }
 
-export const InitialState: State = {
-    Topic: "",
+export const InitialState = {
     Status: false,
-    Data: ""
+    Topic: "",
+    Details: ""
 }
-
 
 export const ContextReducer = (state: State, action: Action): State => {
     switch (action.type) {
-        case "Save Subscribes": {
-            return { ...state, Status: true, Data: "Suscripciones guardadas" };
-        }
-        case "Get Data Subscribes": {
-            return state;
+        case "publish message": {
+            const { status, topic, details } = action.payload;
+            return {...state, Status: status, Topic: topic, Details: details };
         }
         default:
             return state;

@@ -1,26 +1,87 @@
-import React, { createContext, ReactNode, useReducer } from "react";
+import React, { createContext, ReactNode, useEffect, useReducer, useState } from "react";
 import ContextReducer, { InitialState } from "./ContextReducer";
+import mqtt from "mqtt";
 
-interface ContextValues {
-    saveSubscribes: (topic: Array<string>) => void;
-    Status: boolean;
-    Topic: string;
-    Data: string;
+// Configuración MQTT
+const url = "ws://192.168.117.37:9001";
+const options = { username: "loza", password: "loza" };
+const client = mqtt.connect(url, options);
+
+// Definición de los tipos de mensajes y contexto
+interface BodyMessage {
+    topic: string;
+    data: string;
 }
 
-const ContextProvider = createContext<ContextValues | undefined>(undefined); // Exportar para uso en otros componentes  
+interface ContextValues {
+    setTopics: (topics: string[]) => void;
+    Status: boolean;
+    Topic: string;
+    Details: string;
+    message: BodyMessage;
+    PublishMessage: (topic: string, message: string) => void;
+}
+
+const ContextProvider = createContext<ContextValues | undefined>(undefined);
 
 export const ContextConsumer: React.FC<{ children: ReactNode }> = ({ children }) => {
+
+    const [topics, setTopics] = useState<string[]>([]);
     const [state, dispatch] = useReducer(ContextReducer, InitialState);
+    const [message, setMessage] = useState<BodyMessage>({ topic: "", data: "" });
 
-    const saveSubscribes = (topic: Array<string>): void => {
-        dispatch({ type: "Save Subscribes", payload: topic });
-    };
+    useEffect(() => {
+        client.on("connect", () => {
+            console.log("Mqtt Socket connection success.");
+            if (topics.length > 0) {
+                client.subscribe(topics, (err) => {
+                    if (!err) {
+                        console.log("Mqtt subscribed to topics successfully.");
+                    } else {
+                        console.log("Failed to subscribe to topics.");
+                    }
+                });
+            }
+        });
 
-    const { Topic, Status, Data } = state;
-    
+        client.on("message", (topic, message) => {
+            setMessage({ topic, data: message.toString() });
+        });
+
+        client.on("error", (err) => {
+            console.error("MQTT connection error:", err);
+        });
+
+        return () => {
+            client.end();
+        };
+    }, [topics]);
+
+    const PublishMessage = (topic: string, message: string) => {
+        client.publish(topic, message, (err) => {
+            if (err) {
+                dispatch({
+                    type: "publish message", payload: {
+                        status: false,
+                        topic: topic,
+                        details: `Error to publish message: ${err.message}`
+                    }
+                });
+            } else {
+                dispatch({
+                    type: "publish message", payload: {
+                        status: true,
+                        topic: topic,
+                        details: `Message publish success.`
+                    }
+                });
+            }
+        });
+    }
+    const { Topic, Status, Details } = state;
+
     return (
-        <ContextProvider.Provider value={{ saveSubscribes, Topic, Status, Data }}>
+        <ContextProvider.Provider value={{ setTopics, Topic, Status, Details, message, PublishMessage }}>
             {children}
         </ContextProvider.Provider>
     );
