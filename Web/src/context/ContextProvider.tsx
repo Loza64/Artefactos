@@ -31,11 +31,7 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
 
     // Socket  
     const client = useRef(mqtt.connect(url, options));
-    const topics: string[] = [
-        "/test/int",
-        "/test/float",
-        "/test/comment"
-    ];
+    const topics: string[] = []
 
     useEffect(() => {
         const mqttClient = client.current;
