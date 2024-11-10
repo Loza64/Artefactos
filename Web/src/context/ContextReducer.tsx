@@ -9,12 +9,6 @@ interface State {
     Details: string;
 }
 
-export const InitialState = {
-    Status: false,
-    Topic: "",
-    Details: ""
-}
-
 export const ContextReducer = (state: State, action: Action): State => {
     switch (action.type) {
         case "publish message": {

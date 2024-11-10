@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useEffect, useReducer, useState } from "react";
-import ContextReducer, { InitialState } from "./ContextReducer";
+import ContextReducer from "./ContextReducer";
 import mqtt from "mqtt";
 
 // Configuración MQTT
@@ -27,7 +27,7 @@ const ContextProvider = createContext<ContextValues | undefined>(undefined);
 export const ContextConsumer: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const [topics, setTopics] = useState<string[]>([]);
-    const [state, dispatch] = useReducer(ContextReducer, InitialState);
+    const [state, dispatch] = useReducer(ContextReducer, { Status: false, Topic: "", Details: "" });
     const [message, setMessage] = useState<BodyMessage>({ topic: "", data: "" });
 
     useEffect(() => {
