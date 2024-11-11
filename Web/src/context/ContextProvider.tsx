@@ -25,7 +25,6 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 
 export default function ContextProvider({ children }: { children: ReactNode }) {
 
-    // Hooks  
     const [state, dispatch] = useReducer(Reducer, InitState);
     const [message, setMessage] = useState<BodyMessage>({});
 
@@ -91,7 +90,6 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
     };
 
     const { topic, status, details } = state;
-
 
     return (
         <Context.Provider value={{ topic, status, details, PublishMessage, message }}>
