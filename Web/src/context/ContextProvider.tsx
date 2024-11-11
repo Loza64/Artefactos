@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, ReactNode, useEffect, useReducer, useState, useRef, useContext } from "react";
 import Reducer, { InitState } from "./Reducer";
@@ -13,10 +14,10 @@ interface BodyMessage {
 }
 
 interface ContextValues {
-    isConnected: boolean;
-    Topic: string;
-    Details: string;
-    message: BodyMessage;
+    status: boolean
+    topic: string;
+    details: string;
+    message: BodyMessage
     PublishMessage: (topic: string, message: string) => void;
 }
 
@@ -25,24 +26,19 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 export default function ContextProvider({ children }: { children: ReactNode }) {
 
     // Hooks  
-    const [isConnected, setIsConnected] = useState(false);
     const [state, dispatch] = useReducer(Reducer, InitState);
     const [message, setMessage] = useState<BodyMessage>({});
 
-    // Socket  
     const client = useRef(mqtt.connect(url, options));
+    const socket = client.current
     const topics: string[] = []
 
     useEffect(() => {
-        const mqttClient = client.current;
-
-        mqttClient.on("connect", () => {
-            console.log("MQTT Socket connection success.");
-            setIsConnected(true);
+        socket.on("connect", () => {
             if (topics.length > 0) {
-                mqttClient.subscribe(topics, (err) => {
+                socket.subscribe(topics, (err) => {
                     if (err) {
-                        console.log("Failed to subscribe to topics: ", err);
+                        console.error("Subscribed to topics error: ", err);
                     } else {
                         console.log("Subscribed to topics successfully.");
                     }
@@ -50,60 +46,55 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
             }
         });
 
-        mqttClient.on("message", (topic, message) => {
+        socket.on("message", (topic, message) => {
             setMessage({ [topic]: message.toString() });
             console.log({ [topic]: message.toString() });
         });
 
-        mqttClient.on("error", (err) => {
+        socket.on("error", (err) => {
             console.error("MQTT connection error:", err);
         });
 
-        mqttClient.on("close", () => {
+        socket.on("close", () => {
             console.log("MQTT connection closed.");
-            setIsConnected(false);
         });
 
         return () => {
-            mqttClient.end();
+            socket.end();
         };
     }, []);
 
     const PublishMessage = (topic: string, message: string) => {
-        client.current.publish(topic, message, (err) => {
-            if (err) {
-                dispatch({
-                    type: "publish message", payload: {
-                        status: false,
-                        topic: topic,
-                        details: `Error to publish message: ${err.message}`
-                    }
-                });
-            } else {
-                dispatch({
-                    type: "publish message", payload: {
-                        status: true,
-                        topic: topic,
-                        details: `Message publish success.`
-                    }
-                });
-            }
-        });
+        if (socket.connected) {
+            socket.publish(topic, message, (err) => {
+                if (err) {
+                    dispatch({
+                        type: "publish message", payload: {
+                            status: true,
+                            topic: topic,
+                            details: err.message
+                        }
+                    });
+                } else {
+                    dispatch({
+                        type: "publish message", payload: {
+                            status: true,
+                            topic: topic,
+                            details: `Publish message success.`
+                        }
+                    });
+                }
+            });
+        } else {
+            alert("mqtt is not connected");
+        }
     };
 
-    const { Topic, Status, Details } = state;
+    const { topic, status, details } = state;
 
-    const contextValue = {
-        Topic,
-        Status,
-        Details,
-        message,
-        PublishMessage,
-        isConnected
-    };
 
     return (
-        <Context.Provider value={contextValue}>
+        <Context.Provider value={{ topic, status, details, PublishMessage, message }}>
             {children}
         </Context.Provider>
     );

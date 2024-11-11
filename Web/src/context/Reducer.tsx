@@ -6,18 +6,18 @@ type Action = {
 };
 
 interface State {
-    Status: boolean;
-    Topic: string;
-    Details: string;
+    status: boolean;
+    topic: string;
+    details: string;
 }
 
-export const InitState = { Status: false, Topic: "", Details: "" }
+export const InitState = { status: false, topic: "", details: "" }
 
 export const Reducer = (state: State, action: Action): State => {
     switch (action.type) {
         case "publish message": {
             const { status, topic, details } = action.payload;
-            return { ...state, Status: status, Topic: topic, Details: details };
+            return { ...state, status,topic, details };
         }
         default:
             return state;
