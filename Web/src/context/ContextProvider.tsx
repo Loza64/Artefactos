@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, ReactNode, useEffect, useReducer, useState, useRef, useContext } from "react";
-import Reducer, { InitState } from "./Reducer";
+import { createContext, ReactNode, useEffect, useState, useRef, useContext } from "react";
 import mqtt from "mqtt";
 
 const { VITE_IP, VITE_USER, VITE_PASS } = import.meta.env;
@@ -14,9 +13,6 @@ interface BodyMessage {
 }
 
 interface ContextValues {
-    status: boolean
-    topic: string;
-    details: string;
     message: BodyMessage
     PublishMessage: (topic: string, message: string) => void;
 }
@@ -25,7 +21,6 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 
 export default function ContextProvider({ children }: { children: ReactNode }) {
 
-    const [state, dispatch] = useReducer(Reducer, InitState);
     const [message, setMessage] = useState<BodyMessage>({});
 
     const client = useRef(mqtt.connect(url, options));
@@ -67,21 +62,9 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
         if (socket.connected) {
             socket.publish(topic, message, (err) => {
                 if (err) {
-                    dispatch({
-                        type: "publish message", payload: {
-                            status: true,
-                            topic: topic,
-                            details: err.message
-                        }
-                    });
+                    //Error message
                 } else {
-                    dispatch({
-                        type: "publish message", payload: {
-                            status: true,
-                            topic: topic,
-                            details: `Publish message success.`
-                        }
-                    });
+                   //Success message
                 }
             });
         } else {
@@ -89,10 +72,8 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const { topic, status, details } = state;
-
     return (
-        <Context.Provider value={{ topic, status, details, PublishMessage, message }}>
+        <Context.Provider value={{ PublishMessage, message }}>
             {children}
         </Context.Provider>
     );
