@@ -1,17 +1,17 @@
-/* Módulo RFID (MFRC522)	ESP8266
+/* Módulo RFID        ESP8266
 SDA	                  D2 (GPIO 4)
 SCK	                  D5 (GPIO 14)
-MOSI	                D7 (GPIO 13)
-MISO	                D6 (GPIO 12)
+MOSI	              D7 (GPIO 13)
+MISO	              D6 (GPIO 12)
 RST	                  D1 (GPIO 5)
 VCC	                  3.3V
 GND	                  GND
 */
 
-/* SG90 ESP8266
-Brown (GND)
-Red (VCC)
-Orange (Signal) D3
+/* SG90        ESP8266
+Brown          (GND)
+Red            (VCC)
+Orange         D3
 */
 
 #include <SPI.h>
