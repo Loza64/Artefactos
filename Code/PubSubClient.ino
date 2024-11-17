@@ -1,8 +1,8 @@
 /* Módulo RFID        ESP8266
 SDA	                  D2 (GPIO 4)
 SCK	                  D5 (GPIO 14)
-MOSI	              D7 (GPIO 13)
-MISO	              D6 (GPIO 12)
+MOSI	                D7 (GPIO 13)
+MISO	                D6 (GPIO 12)
 RST	                  D1 (GPIO 5)
 VCC	                  3.3V
 GND	                  GND
@@ -40,21 +40,42 @@ const char *topics[] = {
 
 };
 
-// RFID
+//RFID
 #define SS_PIN D2
 #define RST_PIN D1
-#define SMOTOR D3
-
-// Servo Motor
 MFRC522 rfid(SS_PIN, RST_PIN);
+
+//Servo Motor
+#define SMOTOR D3
 Servo servo;
 
-void Servo(int position) {
-  servo.write(position);
-  delay(1000);
+void RFID(){
+  if (rfid.PICC_IsNewCardPresent()) {
+    if (rfid.PICC_ReadCardSerial()) {
+      String card = "";
+
+      for (byte i = 0; i < rfid.uid.size; i++) {
+        card += (rfid.uid.uidByte[i] < 0x10 ? " 0" : " ") + String(rfid.uid.uidByte[i], HEX);
+      }
+      Publish(topics[0], card.c_str());
+      Serial.println("public: " + card + " to " + topics[0]);
+      rfid.PICC_HaltA();
+    }
+  }
 }
 
-// Mqtt Functions
+//------------------------------------------------Servo Function------------------------------------------------
+void Servo(int position) {
+  if (position <= 180) {
+    servo.write(180);
+    delay(3500);
+    servo.write(0);
+  } else {
+    Serial.println("Error to move servo");
+  }
+}
+
+//-------------------------------------------------Wifi Connection------------------------------------------------
 void WifiConnection() {
   delay(10);
   Serial.printf("\nConectando a %s ", ssid);
@@ -68,7 +89,8 @@ void WifiConnection() {
   Serial.println("\nConectado al WiFi");
 }
 
-void Reconnect() {
+//------------------------------------------------Mqtt Reconnection------------------------------------------------
+void ReconnectMqtt() {
   while (!mqttClient.connected()) {
     Serial.println("Conectando al broker MQTT...");
     if (mqttClient.connect("ESP-Client", mqtt_user, mqtt_password)) {
@@ -85,6 +107,7 @@ void Reconnect() {
   }
 }
 
+//------------------------------------------------MQTT Functions------------------------------------------------
 void Publish(const char *topic, const char *message) {
   mqttClient.publish(topic, message);
 }
@@ -104,12 +127,11 @@ void CallBack(char *topic, byte *message, unsigned int length) {
   WebDataManage(topic, data);
 }
 
-// Dara from web
+//------------------------------------------------Data from web------------------------------------------------
 void WebDataManage(const char *topic, const String data) {
   if (strcmp(topic, subscriptions[0]) == 0) {
     if (data == "open") {
-      servo.write(180);
-      delay(2000);
+      Servo(180);
     }
   } else if (strcmp(topic, "topic2") == 0) {
   } else if (strcmp(topic, "topic3") == 0) {
@@ -119,32 +141,31 @@ void WebDataManage(const char *topic, const String data) {
 }
 
 void setup() {
-  Serial.begin(115200);
-  servo.attach(SMOTOR);
-  SPI.begin();
-  rfid.PCD_Init();
+  //Init wifi
   WifiConnection();
+
+  //Init mqtt
   mqttClient.setServer(mqtt_server, 1883);
   mqttClient.setCallback(CallBack);
+
+  //Init serial
+  Serial.begin(115200);
+
+  //Init servo
+  servo.attach(SMOTOR);
+  servo.write(0);
+
+  //Init rfid
+  SPI.begin();
+  rfid.PCD_Init();
 }
 
 void loop() {
 
   if (!mqttClient.connected()) {
-    Reconnect();
+    ReconnectMqtt();
   }
   mqttClient.loop();
-
-  if (rfid.PICC_IsNewCardPresent()) {
-    if (rfid.PICC_ReadCardSerial()) {
-      String card = "";
-
-      for (byte i = 0; i < rfid.uid.size; i++) {
-        card += (rfid.uid.uidByte[i] < 0x10 ? " 0" : " ") + String(rfid.uid.uidByte[i], HEX);
-      }
-      Publish(topics[0], card.c_str());
-      Serial.println(card);
-      rfid.PICC_HaltA();
-    }
-  }
+  
+  RFID();
 }

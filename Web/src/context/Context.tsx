@@ -19,7 +19,7 @@ interface ContextValues {
 
 export const Context = createContext<ContextValues | undefined>(undefined);
 
-export default function ContextProvider({ children }: { children: ReactNode }) {
+export default function Provider({ children }: { children: ReactNode }) {
 
     const [message, setMessage] = useState<BodyMessage>({});
 
@@ -81,10 +81,10 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
     );
 }
 
-export const ContextConsumer = () => {
+export const Consumer = () => {
     const contextValue = useContext(Context);
     if (!contextValue) {
-        throw new Error("useContextValue must be used within a ContextProvider");
+        throw new Error("useContextValue must be used within a Provider");
     }
     return contextValue;
 };
