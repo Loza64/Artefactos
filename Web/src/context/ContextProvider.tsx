@@ -25,7 +25,9 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
 
     const client = useRef(mqtt.connect(url, options));
     const socket = client.current
-    const topics: string[] = []
+    const topics: string[] = [
+        "/residencia/people/id/data"
+    ]
 
     useEffect(() => {
         socket.on("connect", () => {
@@ -64,7 +66,7 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
                 if (err) {
                     //Error message
                 } else {
-                   //Success message
+                    //Success message
                 }
             });
         } else {
