@@ -82,9 +82,9 @@ void ResidentDoor(int position) {
 
 void VisitDoor(int position) {
   if (position <= 180) {
-    ServoResident.write(180);
+    ServoVisit.write(180);
     delay(5000);
-    ServoResident.write(0);
+    ServoVisit.write(0);
   } else {
     Serial.println("Error to move servo");
   }
@@ -148,17 +148,21 @@ void WebDataManage(const char *topic, const String data) {
     if (data == "open") {
       ResidentDoor(180);
     }
-  } else if (strcmp(topic, subscriptions[0]) == 0) {
+  }
+  if (strcmp(topic, subscriptions[1]) == 0) {
     if(data == "resident"){
       ResidentDoor(180);
     }
     if(data == "visit"){
       VisitDoor(180);
     }
-  } else if (strcmp(topic, "topic3") == 0) {
-  } else if (strcmp(topic, "topic4") == 0) {
-  } else {
   }
+  
+  if (strcmp(topic, "topic3") == 0) {
+  }
+  if (strcmp(topic, "topic4") == 0) {
+
+  } 
 }
 
 void setup() {
