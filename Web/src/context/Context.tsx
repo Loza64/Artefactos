@@ -74,7 +74,7 @@ export default function Provider({ children }: { children: ReactNode }) {
                         setTimeout(() => { PublishMessage(topics[0], "open") }, 1000);
                         setHistory(prevHistory => [
                             ...prevHistory,
-                            { date: (new Date()).toLocaleDateString(), details: `Resident: ${check.name} reside house: ${check.house}` }
+                            { date: (new Date()).toLocaleString(), details: `Resident: ${check.name} reside house: ${check.house}` }
                         ]);
                     } else {
                         toast.error("Resident not found");
