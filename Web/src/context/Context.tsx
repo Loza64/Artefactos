@@ -33,11 +33,7 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 export default function Provider({ children }: { children: ReactNode }) {
 
     const [history, setHistory] = useState<HistoryResident[]>([]);
-
-    useEffect(() => {  
-        console.log(history); // Esto imprimirá el nuevo valor de history después de actualizarlo  
-    }, [history]); 
-
+ 
     const residentList: ResidentsList[] = [
         { house: 101, target: '-f3-6c 00-28', name: 'Alice' },
         { house: 102, target: '-63-37 0c-1a', name: 'Bob' },
