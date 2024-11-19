@@ -8,25 +8,55 @@ const { VITE_IP, VITE_USER, VITE_PASS } = import.meta.env;
 const url = `ws://${VITE_IP}:9001`;
 const options = { username: VITE_USER, password: VITE_PASS };
 
+//Interface body
 interface BodyMessage {
     [topic: string]: string;
 }
 
+interface HistoryResident {
+    date: string
+    details: string
+}
+
+interface ResidentsList {
+    house: number
+    target: string
+    name: string
+}
+
 interface ContextValues {
+    residentList: ResidentsList[]
+    history: HistoryResident[]
     message: BodyMessage
     PublishMessage: (topic: string, message: string) => void;
 }
 
+//Context
 export const Context = createContext<ContextValues | undefined>(undefined);
 
 export default function Provider({ children }: { children: ReactNode }) {
 
     const [message, setMessage] = useState<BodyMessage>({});
 
+    const [history, setHistory] = useState<HistoryResident[]>([
+        { date: '2023-01-01', details: 'Alice moved into house 101' },
+        { date: '2023-02-10', details: 'Bob moved into house 102' },
+        { date: '2023-03-20', details: 'Charlie moved into house 103' },
+        { date: '2023-03-20', details: 'Emergency to resident' },
+        { date: '2023-03-20', details: 'Emergency to invited' }
+    ])
+
+    const [residentList, setResidentList] = useState<ResidentsList[]>([
+        { house: 101, target: 'Kitchen', name: 'Alice' },
+        { house: 102, target: 'Living Room', name: 'Bob' },
+        { house: 103, target: 'Bedroom', name: 'Charlie' },
+    ]);
+
     const client = useRef(mqtt.connect(url, options));
     const socket = client.current
+
     const topics: string[] = [
-        "/residencia/people/id/data"
+        "/resident/target"
     ]
 
     useEffect(() => {
@@ -75,7 +105,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <Context.Provider value={{ PublishMessage, message }}>
+        <Context.Provider value={{ PublishMessage, message, history, residentList }}>
             {children}
         </Context.Provider>
     );

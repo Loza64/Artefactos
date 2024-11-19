@@ -36,8 +36,8 @@ const char *subscriptions[] = {
 };
 
 const char *topics[] = {
-  "/residencia/people/id/data",
-
+  "/resident/target",
+  "/visit/target"
 };
 
 //RFID
