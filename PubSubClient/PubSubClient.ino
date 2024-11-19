@@ -11,7 +11,7 @@ GND	                  GND
 /* SG90        ESP8266
 Brown          (GND)
 Red            (VCC)
-Orange         D3
+Orange         DIGITAL PIN
 */
 
 #include <SPI.h>
@@ -24,7 +24,7 @@ Orange         D3
 const char *ssid = "Loza";
 const char *password = "e3dc108b83";
 
-const char *mqtt_server = "192.168.205.37";
+const char *mqtt_server = "192.168.251.37";
 const char *mqtt_user = "loza";
 const char *mqtt_password = "loza";
 
@@ -32,7 +32,8 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
 const char *subscriptions[] = {
-  "/residencia/web/data/motor"
+  "/residencial/door",
+  "/residencial/emergency"
 };
 
 const char *topics[] = {
@@ -45,9 +46,13 @@ const char *topics[] = {
 #define RST_PIN D1
 MFRC522 rfid(SS_PIN, RST_PIN);
 
-//Servo Motor
-#define SMOTOR D3
-Servo servo;
+//Servo Motor Resident
+#define rmotor D4
+Servo ServoResident;
+
+//Servo Motor Visit
+#define vmotor D3
+Servo ServoVisit;
 
 void RFID(){
   if (rfid.PICC_IsNewCardPresent()) {
@@ -55,7 +60,7 @@ void RFID(){
       String card = "";
 
       for (byte i = 0; i < rfid.uid.size; i++) {
-        card += (rfid.uid.uidByte[i] < 0x10 ? " 0" : " ") + String(rfid.uid.uidByte[i], HEX);
+        card += (rfid.uid.uidByte[i] < 0x10 ? " 0" : "-") + String(rfid.uid.uidByte[i], HEX);
       }
       Publish(topics[0], card.c_str());
       Serial.println("public: " + card + " to " + topics[0]);
@@ -64,12 +69,22 @@ void RFID(){
   }
 }
 
-//------------------------------------------------Servo Function------------------------------------------------
-void Servo(int position) {
+//------------------------------------------------Servo Functions------------------------------------------------
+void ResidentDoor(int position) {
   if (position <= 180) {
-    servo.write(180);
-    delay(3500);
-    servo.write(0);
+    ServoResident.write(180);
+    delay(5000);
+    ServoResident.write(0);
+  } else {
+    Serial.println("Error to move servo");
+  }
+}
+
+void VisitDoor(int position) {
+  if (position <= 180) {
+    ServoResident.write(180);
+    delay(5000);
+    ServoResident.write(0);
   } else {
     Serial.println("Error to move servo");
   }
@@ -131,9 +146,15 @@ void CallBack(char *topic, byte *message, unsigned int length) {
 void WebDataManage(const char *topic, const String data) {
   if (strcmp(topic, subscriptions[0]) == 0) {
     if (data == "open") {
-      Servo(180);
+      ResidentDoor(180);
     }
-  } else if (strcmp(topic, "topic2") == 0) {
+  } else if (strcmp(topic, subscriptions[0]) == 0) {
+    if(data == "resident"){
+      ResidentDoor(180);
+    }
+    if(data == "visit"){
+      VisitDoor(180);
+    }
   } else if (strcmp(topic, "topic3") == 0) {
   } else if (strcmp(topic, "topic4") == 0) {
   } else {
@@ -151,9 +172,13 @@ void setup() {
   //Init serial
   Serial.begin(115200);
 
-  //Init servo
-  servo.attach(SMOTOR);
-  servo.write(0);
+  //Init servo resident
+  ServoResident.attach(rmotor);
+  ServoResident.write(0);
+
+  //Init servo visit
+  ServoVisit.attach(vmotor);
+  ServoVisit.write(0);
 
   //Init rfid
   SPI.begin();

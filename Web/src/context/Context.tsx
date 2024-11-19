@@ -2,6 +2,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, ReactNode, useEffect, useState, useRef, useContext } from "react";
 import mqtt from "mqtt";
+import { toast } from "react-toastify";
 
 const { VITE_IP, VITE_USER, VITE_PASS } = import.meta.env;
 
@@ -28,6 +29,7 @@ interface ContextValues {
     residentList: ResidentsList[]
     history: HistoryResident[]
     message: BodyMessage
+    topics:string[]
     PublishMessage: (topic: string, message: string) => void;
 }
 
@@ -47,34 +49,50 @@ export default function Provider({ children }: { children: ReactNode }) {
     ])
 
     const [residentList, setResidentList] = useState<ResidentsList[]>([
-        { house: 101, target: 'Kitchen', name: 'Alice' },
-        { house: 102, target: 'Living Room', name: 'Bob' },
-        { house: 103, target: 'Bedroom', name: 'Charlie' },
+        { house: 101, target: '-f3-6c 00-28', name: 'Alice' },
+        { house: 102, target: '-63-37 0c-1a', name: 'Bob' },
+        { house: 103, target: '-43-9e-a2-13', name: 'Charlie' },
     ]);
 
     const client = useRef(mqtt.connect(url, options));
     const socket = client.current
 
+    const subscriptions: string[] = [
+        "/resident/target",
+        "/visit/target"
+    ]
     const topics: string[] = [
-        "/resident/target"
+        "/residencial/door",
+        "/residencial/emergency"
     ]
 
     useEffect(() => {
         socket.on("connect", () => {
-            if (topics.length > 0) {
-                socket.subscribe(topics, (err) => {
+            if (subscriptions.length > 0) {
+                socket.subscribe(subscriptions, (err) => {
                     if (err) {
                         console.error("Subscribed to topics error: ", err);
                     } else {
-                        console.log("Subscribed to topics successfully.");
+                        console.log("Subscribed .");
                     }
                 });
             }
         });
 
         socket.on("message", (topic, message) => {
-            setMessage({ [topic]: message.toString() });
-            console.log({ [topic]: message.toString() });
+
+            switch (topic) {
+                case subscriptions[0]: {
+                    const check = residentList.find((item) => item.target === message.toString());
+                    if (check) {
+                        toast.success(`Resident: ${check.name} reside house: ${check.house}`);
+                        setHistory((prev) => [...prev, { date: (new Date()).toLocaleDateString(), details: `Resident: ${check.name} reside house: ${check.house}` }])
+                        setTimeout(() => { PublishMessage(topics[0], "open") }, 800);
+                    } else {
+                        toast.error("Resident not found");
+                    }
+                }
+            }
         });
 
         socket.on("error", (err) => {
@@ -105,7 +123,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <Context.Provider value={{ PublishMessage, message, history, residentList }}>
+        <Context.Provider value={{ PublishMessage, message, history, residentList, topics }}>
             {children}
         </Context.Provider>
     );
