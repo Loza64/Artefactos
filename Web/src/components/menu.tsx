@@ -10,7 +10,7 @@ const Menu: React.FC = () => {
             <div className="menu">
                 <label className="logo">Residencial godines</label>
                 <div className="options">
-                    <button>Visitante</button>
+                    <button onClick={() =>{setOpen(true)}}>Visitante</button>
                     <button onClick={() => { PublishMessage(topics[1], "resident") }}>Emergencia residente</button>
                     <button onClick={() => { PublishMessage(topics[1], "visit") }}>Emergencia visitante</button>
                 </div>
