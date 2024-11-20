@@ -20,11 +20,16 @@ interface ResidentsList {
     name: string
 }
 
+interface BodyTargeta {
+    [targeta: string]: string
+}
+
 interface ContextValues {
     residentList: ResidentsList[]
     history: HistoryResident[]
     topics: string[]
-    PublishMessage: (topic: string, message: string) => void;
+    PublishMessage: (topic: string, message: string) => void
+    targeta: BodyTargeta
 }
 
 //Context
@@ -33,7 +38,8 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 export default function Provider({ children }: { children: ReactNode }) {
 
     const [history, setHistory] = useState<HistoryResident[]>([]);
- 
+    const [targeta, setTargeta] = useState<BodyTargeta>({});
+
     const residentList: ResidentsList[] = [
         { house: 101, target: '-f3-6c 00-28', name: 'Alice' },
         { house: 102, target: '-63-37 0c-1a', name: 'Bob' },
@@ -70,15 +76,21 @@ export default function Provider({ children }: { children: ReactNode }) {
                 case subscriptions[0]: {
                     const check = residentList.find((item) => item.target === message.toString());
                     if (check) {
-                        toast.success(`Resident: ${check.name} reside house: ${check.house}`);
+                        toast.success(`${check.name} reside house: ${check.house}`, { position: 'bottom-right' });
                         setTimeout(() => { PublishMessage(topics[0], "open") }, 1000);
                         setHistory(prevHistory => [
                             ...prevHistory,
-                            { date: (new Date()).toLocaleString(), details: `Resident: ${check.name} reside house: ${check.house}` }
+                            { date: (new Date()).toLocaleString(), details: `${check.name} reside house: ${check.house}` }
                         ]);
                     } else {
                         toast.error("Resident not found");
                     }
+                    break;
+                }
+
+                case subscriptions[1]: {
+                    setTargeta((prev) => ({ ...prev, [topic]: message.toString() }));
+                    break;
                 }
             }
         });
@@ -111,7 +123,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <Context.Provider value={{ PublishMessage, history, residentList, topics }}>
+        <Context.Provider value={{ PublishMessage, history, residentList, topics, targeta }}>
             {children}
         </Context.Provider>
     );
