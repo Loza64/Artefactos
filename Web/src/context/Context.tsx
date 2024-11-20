@@ -25,6 +25,7 @@ interface ContextValues {
     residentList: ResidentsList[]
     history: History[]
     topics: string[]
+    visit: boolean
     PublishMessage: (topic: string, message: string) => void
 }
 
@@ -34,6 +35,7 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 export default function Provider({ children }: { children: ReactNode }) {
 
     const [history, setHistory] = useState<History[]>([]);
+    const [visit, setVisit] = useState<boolean>(false);
 
     const residentList: ResidentsList[] = [
         { house: 101, target: '-f3-6c 00-28', name: 'Alice' },
@@ -82,6 +84,12 @@ export default function Provider({ children }: { children: ReactNode }) {
                     }
                     break;
                 }
+
+                case subscriptions[1]: {
+                    setVisit(message.toString() === "active");
+                    setTimeout(() => { setVisit(false) }, 10000);
+                    break;
+                }
             }
         });
 
@@ -118,7 +126,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <Context.Provider value={{ PublishMessage, history, residentList, topics}}>
+        <Context.Provider value={{ PublishMessage, history, residentList, topics, visit }}>
             {children}
         </Context.Provider>
     );
