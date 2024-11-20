@@ -3,8 +3,10 @@ import { Consumer } from "../context/Context";
 import Visit from "./visit";
 
 const Menu: React.FC = () => {
+
     const { PublishMessage, topics } = Consumer();
     const [open, setOpen] = useState<boolean>(false);
+
     return (
         <>
             <div className="menu">

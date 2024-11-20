@@ -9,8 +9,9 @@ const { VITE_IP, VITE_USER, VITE_PASS } = import.meta.env;
 const url = `ws://${VITE_IP}:9001`;
 const options = { username: VITE_USER, password: VITE_PASS };
 
-interface HistoryResident {
+interface History {
     date: string
+    type: string
     details: string
 }
 
@@ -20,16 +21,11 @@ interface ResidentsList {
     name: string
 }
 
-interface BodyTargeta {
-    [targeta: string]: string
-}
-
 interface ContextValues {
     residentList: ResidentsList[]
-    history: HistoryResident[]
+    history: History[]
     topics: string[]
     PublishMessage: (topic: string, message: string) => void
-    targeta: BodyTargeta
 }
 
 //Context
@@ -37,8 +33,7 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 
 export default function Provider({ children }: { children: ReactNode }) {
 
-    const [history, setHistory] = useState<HistoryResident[]>([]);
-    const [targeta, setTargeta] = useState<BodyTargeta>({});
+    const [history, setHistory] = useState<History[]>([]);
 
     const residentList: ResidentsList[] = [
         { house: 101, target: '-f3-6c 00-28', name: 'Alice' },
@@ -51,10 +46,10 @@ export default function Provider({ children }: { children: ReactNode }) {
 
     const subscriptions: string[] = [
         "/resident/target",
-        "/visit/target"
+        "/residencial/visit"
     ]
     const topics: string[] = [
-        "/residencial/door",
+        "/residencial/door/",
         "/residencial/emergency"
     ]
 
@@ -80,16 +75,11 @@ export default function Provider({ children }: { children: ReactNode }) {
                         setTimeout(() => { PublishMessage(topics[0], "open") }, 1000);
                         setHistory(prevHistory => [
                             ...prevHistory,
-                            { date: (new Date()).toLocaleString(), details: `${check.name} reside house: ${check.house}` }
+                            { date: (new Date()).toLocaleString(), type: "normal", details: `${check.name} reside house: ${check.house}` }
                         ]);
                     } else {
-                        toast.error("Resident not found");
+                        toast.error("Resident not found ", { position: 'bottom-right' });
                     }
-                    break;
-                }
-
-                case subscriptions[1]: {
-                    setTargeta((prev) => ({ ...prev, [topic]: message.toString() }));
                     break;
                 }
             }
@@ -112,9 +102,14 @@ export default function Provider({ children }: { children: ReactNode }) {
         if (socket.connected) {
             socket.publish(topic, message, (err) => {
                 if (err) {
-                    //Error message
+                    alert(err)
                 } else {
-                    //Success message
+                    if (topic === topics[1]) {
+                        setHistory(prevHistory => [
+                            ...prevHistory,
+                            { date: (new Date()).toLocaleString(), type: "emergency", details: `Emergency to ${message}` }
+                        ]);
+                    }
                 }
             });
         } else {
@@ -123,7 +118,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <Context.Provider value={{ PublishMessage, history, residentList, topics, targeta }}>
+        <Context.Provider value={{ PublishMessage, history, residentList, topics}}>
             {children}
         </Context.Provider>
     );
