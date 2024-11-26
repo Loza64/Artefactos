@@ -24,7 +24,7 @@ Orange         DIGITAL PIN
 const char *ssid = "Loza";
 const char *password = "e3dc108b83";
 
-const char *mqtt_server = "192.168.251.37";
+const char *mqtt_server = "192.168.5.37";
 const char *mqtt_user = "loza";
 const char *mqtt_password = "loza";
 
