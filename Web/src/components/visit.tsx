@@ -12,7 +12,8 @@ const Visit: React.FC<VisitProps> = ({ open, setOpen }) => {
 
   const SubMitForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    PublishMessage(topics[1], "visit");
+    PublishMessage(topics[2], "open");
+    setOpen(false);
   }
 
   return (
@@ -30,7 +31,7 @@ const Visit: React.FC<VisitProps> = ({ open, setOpen }) => {
           <input type="text" placeholder="dui" />
           <input type="text" placeholder="nombre" />
           <input type="number" placeholder="numero de casa a visitar" />
-          <button>Autorizar visita</button>
+          <input type='submit' className='submit' value={"Autorizar visita"}/>
         </form>
       </div>
     </Modal>
@@ -115,7 +116,7 @@ transition: all 0.3s ease-in-out;
      transition: all 0.5s ease-in-out;     
     }
 
-    button {  
+    .submit {  
     background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(2,0,255,1) 100%);  
     border: none;  
     color: white;  
@@ -129,11 +130,11 @@ transition: all 0.3s ease-in-out;
     transition: all 0.1s ease-in-out;
     }  
 
-    button:hover {  
+    .submit:hover {  
     background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,128,1) 100%); 
     }  
 
-    button:active {  
+    .submit:active {  
     transform:scale(0.99);
     }
 }

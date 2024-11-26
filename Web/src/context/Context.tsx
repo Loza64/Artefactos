@@ -11,6 +11,7 @@ const options = { username: VITE_USER, password: VITE_PASS };
 
 interface History {
     date: string
+    time: string
     type: string
     details: string
 }
@@ -51,8 +52,9 @@ export default function Provider({ children }: { children: ReactNode }) {
         "/residencial/visit"
     ]
     const topics: string[] = [
-        "/residencial/door/",
-        "/residencial/emergency"
+        "/residencial/resident/door/",
+        "/residencial/emergency",
+        "/residencial/visit/door/"
     ]
 
     useEffect(() => {
@@ -77,7 +79,12 @@ export default function Provider({ children }: { children: ReactNode }) {
                         setTimeout(() => { PublishMessage(topics[0], "open") }, 1000);
                         setHistory(prevHistory => [
                             ...prevHistory,
-                            { date: (new Date()).toLocaleString(), type: "normal", details: `${check.name} reside house: ${check.house}` }
+                            {
+                                date: new Date().toLocaleDateString(),
+                                time: new Date().toLocaleTimeString(),
+                                type: "normal",
+                                details: `${check.name} reside house: ${check.house}`
+                            }
                         ]);
                     } else {
                         toast.error("Resident not found ", { position: 'bottom-right' });
@@ -112,11 +119,33 @@ export default function Provider({ children }: { children: ReactNode }) {
                 if (err) {
                     alert(err)
                 } else {
-                    if (topic === topics[1]) {
-                        setHistory(prevHistory => [
-                            ...prevHistory,
-                            { date: (new Date()).toLocaleString(), type: "emergency", details: `Emergency to ${message}` }
-                        ]);
+                    switch (topic) {
+                        case topics[1]: {
+                            setHistory(prevHistory => [
+                                ...prevHistory,
+                                {
+                                    date: new Date().toLocaleDateString(),
+                                    time: new Date().toLocaleTimeString(),
+                                    type: "emergency",
+                                    details: `Emergency to ${message}`
+                                }
+                            ]);
+                            break;
+                        }
+                        case topics[2]: {
+                            setHistory(prevHistory => [
+                                ...prevHistory,
+                                {
+                                    date: new Date().toLocaleDateString(), 
+                                    time: new Date().toLocaleTimeString(),
+                                    type: "visit",
+                                    details: `Open door to visit`
+                                }
+                            ]);
+                            break;
+                        }
+                        default:
+                            break;
                     }
                 }
             });

@@ -8,10 +8,15 @@ VCC	                  3.3V
 GND	                  GND
 */
 
-/* SG90        ESP8266
-Brown          (GND)
-Red            (VCC)
-Orange         DIGITAL PIN
+/* SG90          ESP8266
+Brown            (GND)
+Red              (VCC)
+Orange           DIGITAL PIN: Resident D0, Visit D8
+*/
+
+/* Ultrasonic    ESP8266
+triger           D4
+echo             D3
 */
 
 #include <SPI.h>
@@ -32,13 +37,14 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
 const char *subscriptions[] = {
-  "/residencial/door",
-  "/residencial/emergency"
+  "/residencial/resident/door/",
+  "/residencial/emergency",
+  "/residencial/visit/door/"
 };
 
 const char *topics[] = {
   "/resident/target",
-  "/visit/target"
+  "/residencial/visit"
 };
 
 //RFID
@@ -47,13 +53,20 @@ const char *topics[] = {
 MFRC522 rfid(SS_PIN, RST_PIN);
 
 //Servo Motor Resident
-#define rmotor D4
+#define rmotor D0
 Servo ServoResident;
 
 //Servo Motor Visit
-#define vmotor D3
+#define vmotor D8
 Servo ServoVisit;
 
+
+//Ultrasonic
+#define triger D4
+#define echo D3
+
+
+//------------------------------------------------RFID Function------------------------------------------------
 void RFID(){
   if (rfid.PICC_IsNewCardPresent()) {
     if (rfid.PICC_ReadCardSerial()) {
@@ -87,6 +100,26 @@ void VisitDoor(int position) {
     ServoVisit.write(0);
   } else {
     Serial.println("Error to move servo");
+  }
+}
+
+//------------------------------------------------Ultrasonic Function------------------------------------------------
+void UltraSonic() {
+
+  digitalWrite(triger, LOW);
+  delayMicroseconds(2);
+
+  // Establece el TRIG en HIGH durante 10 ms
+  digitalWrite(triger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triger, LOW);
+
+  float duration = pulseIn(echo, HIGH);
+
+  float distance = (duration * 0.034 / 2);
+
+  if(distance <= 10){
+    Publish(topics[1], "active");
   }
 }
 
@@ -158,10 +191,10 @@ void WebDataManage(const char *topic, const String data) {
     }
   }
   
-  if (strcmp(topic, "topic3") == 0) {
-  }
-  if (strcmp(topic, "topic4") == 0) {
-
+  if (strcmp(topic, subscriptions[2]) == 0) {
+     if(data == "open"){
+       VisitDoor(180);
+     }
   } 
 }
 
@@ -187,6 +220,10 @@ void setup() {
   //Init rfid
   SPI.begin();
   rfid.PCD_Init();
+
+  //Init Ultrasonic
+  pinMode(triger, OUTPUT);
+  pinMode(echo, INPUT); 
 }
 
 void loop() {
@@ -197,4 +234,5 @@ void loop() {
   mqttClient.loop();
   
   RFID();
+  UltraSonic();
 }

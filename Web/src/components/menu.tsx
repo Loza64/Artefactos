@@ -12,12 +12,12 @@ const Menu: React.FC = () => {
             <div className="menu">
                 <label className="logo">Residencial godines</label>
                 <div className="options">
-                    { visit && <button onClick={() =>{setOpen(true)}}>Visitante</button>}
+                    {visit && <button onClick={() => { setOpen(true) }}>Visitante</button>}
                     <button onClick={() => { PublishMessage(topics[1], "resident") }}>Emergencia residente</button>
                     <button onClick={() => { PublishMessage(topics[1], "visit") }}>Emergencia visitante</button>
                 </div>
             </div>
-            <Visit  open={open} setOpen={setOpen}></Visit>
+            <Visit open={open} setOpen={setOpen}></Visit>
         </>
 
     )
