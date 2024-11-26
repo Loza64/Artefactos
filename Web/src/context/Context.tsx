@@ -35,7 +35,68 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 
 export default function Provider({ children }: { children: ReactNode }) {
 
-    const [history, setHistory] = useState<History[]>([]);
+    const [history, setHistory] = useState<History[]>([
+        {  
+            date: '11/19/2024',  
+            time: '8:30:05 AM',  
+            type: 'emergency',  
+            details: 'Emergency to resident'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '8:30:10 AM',  
+            type: 'emergency',  
+            details: 'Emergency to visit'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '8:30:20 AM',  
+            type: 'normal',  
+            details: 'Alice reside house: 203'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '8:30:45 AM',  
+            type: 'visit',  
+            details: 'Open door to visit'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '9:15:00 AM',  
+            type: 'normal',  
+            details: 'John reside house: 101'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '10:00:30 AM',  
+            type: 'visit',  
+            details: 'Scheduled visit with resident'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '11:05:15 AM',  
+            type: 'emergency',  
+            details: 'Emergency assistance required'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '1:45:25 PM',  
+            type: 'normal',  
+            details: 'Meeting with staff'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '3:00:00 PM',  
+            type: 'visit',  
+            details: 'Family visit scheduled'  
+        },  
+        {  
+            date: '11/19/2024',  
+            time: '4:30:50 PM',  
+            type: 'normal',  
+            details: 'Check-in with resident'  
+        }
+    ]);
     const [visit, setVisit] = useState<boolean>(false);
 
     const residentList: ResidentsList[] = [
