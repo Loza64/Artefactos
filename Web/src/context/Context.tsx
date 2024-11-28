@@ -27,6 +27,8 @@ interface ContextValues {
     history: History[]
     topics: string[]
     visit: boolean
+    getDayOfWeek: (dateString: string) => string
+    getLongDate: (dateString: string) => string
     PublishMessage: (topic: string, message: string) => void
 }
 
@@ -36,68 +38,81 @@ export const Context = createContext<ContextValues | undefined>(undefined);
 export default function Provider({ children }: { children: ReactNode }) {
 
     const [history, setHistory] = useState<History[]>([
-        {  
-            date: '11/19/2024',  
-            time: '8:30:05 AM',  
-            type: 'emergency',  
-            details: 'Emergency to resident'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '8:30:10 AM',  
-            type: 'emergency',  
-            details: 'Emergency to visit'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '8:30:20 AM',  
-            type: 'normal',  
-            details: 'Alice reside house: 203'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '8:30:45 AM',  
-            type: 'visit',  
-            details: 'Open door to visit'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '9:15:00 AM',  
-            type: 'normal',  
-            details: 'John reside house: 101'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '10:00:30 AM',  
-            type: 'visit',  
-            details: 'Scheduled visit with resident'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '11:05:15 AM',  
-            type: 'emergency',  
-            details: 'Emergency assistance required'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '1:45:25 PM',  
-            type: 'normal',  
-            details: 'Meeting with staff'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '3:00:00 PM',  
-            type: 'visit',  
-            details: 'Family visit scheduled'  
-        },  
-        {  
-            date: '11/19/2024',  
-            time: '4:30:50 PM',  
-            type: 'normal',  
-            details: 'Check-in with resident'  
+        {
+            date: '11/15/2024',
+            time: '8:30:05 AM',
+            type: 'emergency',
+            details: 'Emergency to resident'
+        },
+        {
+            date: '11/19/2024',
+            time: '8:30:10 AM',
+            type: 'emergency',
+            details: 'Emergency to visit'
+        },
+        {
+            date: '11/19/2024',
+            time: '8:30:20 AM',
+            type: 'normal',
+            details: 'Alice reside house: 203'
+        },
+        {
+            date: '11/19/2024',
+            time: '8:30:45 AM',
+            type: 'visit',
+            details: 'Open door to visit'
+        },
+        {
+            date: '11/19/2024',
+            time: '9:15:00 AM',
+            type: 'normal',
+            details: 'John reside house: 101'
+        },
+        {
+            date: '11/19/2024',
+            time: '10:00:30 AM',
+            type: 'visit',
+            details: 'Scheduled visit with resident'
+        },
+        {
+            date: '11/19/2024',
+            time: '11:05:15 AM',
+            type: 'emergency',
+            details: 'Emergency assistance required'
+        },
+        {
+            date: '11/19/2024',
+            time: '1:45:25 PM',
+            type: 'normal',
+            details: 'Meeting with staff'
+        },
+        {
+            date: '11/19/2024',
+            time: '3:00:00 PM',
+            type: 'visit',
+            details: 'Family visit scheduled'
+        },
+        {
+            date: '11/19/2024',
+            time: '4:30:50 PM',
+            type: 'normal',
+            details: 'Check-in with resident'
         }
     ]);
+
     const [visit, setVisit] = useState<boolean>(false);
+
+    const getDayOfWeek = (dateString: string): string => {
+        const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', options);
+    };
+
+    const getLongDate = (dateString: string): string => {
+        const options: Intl.DateTimeFormatOptions = { dateStyle: 'long' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', options);
+    };
 
     const residentList: ResidentsList[] = [
         { house: 101, target: '-f3-6c 00-28', name: 'Alice' },
@@ -136,8 +151,10 @@ export default function Provider({ children }: { children: ReactNode }) {
                 case subscriptions[0]: {
                     const check = residentList.find((item) => item.target === message.toString());
                     if (check) {
+
                         toast.success(`${check.name} reside house: ${check.house}`, { position: 'bottom-right' });
                         setTimeout(() => { PublishMessage(topics[0], "open") }, 1000);
+
                         setHistory(prevHistory => [
                             ...prevHistory,
                             {
@@ -197,7 +214,7 @@ export default function Provider({ children }: { children: ReactNode }) {
                             setHistory(prevHistory => [
                                 ...prevHistory,
                                 {
-                                    date: new Date().toLocaleDateString(), 
+                                    date: new Date().toLocaleDateString(),
                                     time: new Date().toLocaleTimeString(),
                                     type: "visit",
                                     details: `Open door to visit`
@@ -216,7 +233,7 @@ export default function Provider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <Context.Provider value={{ PublishMessage, history, residentList, topics, visit }}>
+        <Context.Provider value={{ PublishMessage, history, residentList, topics, visit, getDayOfWeek, getLongDate }}>
             {children}
         </Context.Provider>
     );

@@ -9,14 +9,16 @@
     h1{
         margin: 15px 0;
     }
+
     table {
         width: 100%;
-        max-width: 90%;
+        max-width: 85%;
         text-align: center;
         border: none;
         border-collapse: collapse;
 
         thead {
+            z-index: 2;
             background: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgb(0, 0, 167) 100%);
             color: white;
             font-weight: 900;
@@ -29,13 +31,28 @@
         }
 
         tbody {
+            z-index: 0;
             tr {
+                animation-name: showItem;
+                animation-iteration-count: 1;
+                animation-duration: 1s;
                 td {
                     font-weight: 900;
                     font-size: 14px;
                     padding: 10px 0px;
                 }
             }
+        }
+    }
+
+    @keyframes showItem {
+        0%{
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        100%{
+            opacity: 1;
+            transform: translateY(0px);
         }
     }
 }

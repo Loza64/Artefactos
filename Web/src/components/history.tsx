@@ -2,7 +2,7 @@ import React from "react";
 import { Consumer } from "../context/Context";
 
 const History: React.FC = () => {
-    const { history } = Consumer();
+    const { history, getDayOfWeek, getLongDate } = Consumer();
 
     const list = history.sort((a, b) => {
         const dateTimeA = new Date(`${a.date} ${a.time}`);
@@ -26,7 +26,7 @@ const History: React.FC = () => {
                     {
                         list.map(({ date, time, type, details }, index) => (
                             <tr style={{ background: (index + 1) % 2 === 0 ? "white" : "#EEEEEE" }} role="row" aria-label={`Event on ${date} at ${time}`}>
-                                <td>{date}</td>
+                                <td>{`${getDayOfWeek(date)}, ${getLongDate(date)}`}</td>
                                 <td>{time}</td>
                                 <td>{type}</td>
                                 <td>{details}</td>
