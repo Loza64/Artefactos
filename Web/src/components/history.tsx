@@ -12,6 +12,7 @@ const History: React.FC = () => {
 
     return (
         <div className="history">
+            <h1>Entradas a la residencial</h1>
             <table>
                 <thead>
                     <tr>

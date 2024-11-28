@@ -27,15 +27,15 @@
             transition: all 0.3s ease-in-out; /* Duración ajustada */  
         
             &:hover {  
-                background: linear-gradient(90deg, black, rgb(0, 0, 114) 100%);  
+                background: linear-gradient(90deg, black, rgb(0, 0, 138) 100%);  
             }  
         
             &:active {  
-                background: linear-gradient(90deg, black, blue 100%); /* Corregido */  
+                background: linear-gradient(90deg, black, blue 100%);
             }  
             
             &:focus {  
-                outline: 2px solid blue; /* Ejemplo de enfoque */  
+                outline: 2px solid blue;
             }  
         }
     }
