@@ -6,7 +6,7 @@
     width: 100%;
     top: 4.8rem;
 
-    h1{
+    h1 {
         margin: 15px 0;
     }
 
@@ -32,10 +32,12 @@
 
         tbody {
             z-index: 0;
+
             tr {
                 animation-name: showItem;
                 animation-iteration-count: 1;
                 animation-duration: 1s;
+
                 td {
                     font-weight: 900;
                     font-size: 14px;
@@ -46,11 +48,12 @@
     }
 
     @keyframes showItem {
-        0%{
+        0% {
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(20px);
         }
-        100%{
+
+        100% {
             opacity: 1;
             transform: translateY(0px);
         }
