@@ -42,7 +42,12 @@ export default function Provider({ children }: { children: ReactNode }) {
         setHistory((prev) => (
             [...prev, {
                 item: history.length + 1,
-                date: new Date().toLocaleDateString(),
+                date: new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }),
                 time: new Date().toLocaleTimeString(),
                 type: type,
                 details: details
