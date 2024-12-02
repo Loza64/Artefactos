@@ -26,12 +26,13 @@ echo             D3
 #include <PubSubClient.h>
 
 // PubSubClient
-const char *ssid = "Loza";
-const char *password = "e3dc108b83";
 
-const char *mqtt_server = "192.168.5.37";
-const char *mqtt_user = "loza";
-const char *mqtt_password = "loza";
+const char *ssid = "rtx5090";
+const char *password = "LMessi10";
+
+const char *mqtt_server = "192.168.150.25";
+const char *mqtt_user = "cristofer";
+const char *mqtt_password = "250803";
 
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
@@ -71,7 +72,6 @@ void RFID(){
   if (rfid.PICC_IsNewCardPresent()) {
     if (rfid.PICC_ReadCardSerial()) {
       String card = "";
-
       for (byte i = 0; i < rfid.uid.size; i++) {
         card += (rfid.uid.uidByte[i] < 0x10 ? " 0" : "-") + String(rfid.uid.uidByte[i], HEX);
       }

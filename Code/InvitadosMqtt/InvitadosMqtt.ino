@@ -77,24 +77,47 @@ Servo ServoVisit;
 //LDR
 #define ldr A0
 
+//Infrarrojo
+#define rf51 D7
+
+//--------------------------------------------Infrarrojo----------------------------------------------------
+void Infrared(){
+  int value = digitalRead(rf51);
+  if(value == 0){
+    ExitDoor(180);
+  }
+}
+
 //------------------------------------------------LEDs RGB-----------------------------------------------------
 void RGBVisit(int led){
-  if(led!=0){
-    digitalWrite(lRedVisit,HIGH);
-    digitalWrite(lGreenVisit,LOW);
-  }else{
-    digitalWrite(lRedVisit,LOW);
-    digitalWrite(lGreenVisit,HIGH);
+  int value = analogRead(ldr);
+  if (value <= 250) {
+    if (led != 0) {
+      digitalWrite(lRedVisit, HIGH);
+      digitalWrite(lGreenVisit, LOW);
+    } else {
+      digitalWrite(lRedVisit, LOW);
+      digitalWrite(lGreenVisit, HIGH);
+    }
+  } else {
+    digitalWrite(lRedVisit, HIGH);
+    digitalWrite(lGreenVisit, HIGH);
   }
 }
 
 void RGBExit(int led){
-  if(led!=0){
-    digitalWrite(lRedExit,HIGH);
-    digitalWrite(lGreenExit,LOW);
-  }else{
-    digitalWrite(lRedExit,LOW);
-    digitalWrite(lGreenExit,HIGH);
+  int value = analogRead(ldr);
+  if (value <= 250) {
+    if (led != 0) {
+      digitalWrite(lRedExit, HIGH);
+      digitalWrite(lGreenExit, LOW);
+    } else {
+      digitalWrite(lRedExit, LOW);
+      digitalWrite(lGreenExit, HIGH);
+    }
+  } else {
+    digitalWrite(lRedExit, HIGH);
+    digitalWrite(lGreenExit, HIGH);
   }
 }
 
@@ -205,7 +228,7 @@ void WebDataManage(const char *topic, const String data) {
   }
   if (strcmp(topic, subscriptions[2]) == 0) {
      if(data == "open"){
-       VisitDoor(180);
+      VisitDoor(180);
     }
   } 
 }
@@ -237,13 +260,13 @@ void setup() {
   //Visit
   pinMode(lRedVisit,OUTPUT);
   pinMode(lGreenVisit,OUTPUT);
-  digitalWrite(lRedVisit,LOW);
-  digitalWrite(lGreenVisit,HIGH);
+  //digitalWrite(lRedVisit,LOW);
+  //digitalWrite(lGreenVisit,HIGH);
   //Exit
   pinMode(lRedExit,OUTPUT);
   pinMode(lGreenExit,OUTPUT);
-  digitalWrite(lRedExit,LOW);
-  digitalWrite(lGreenExit,HIGH);
+  //digitalWrite(lRedExit,LOW);
+  //digitalWrite(lGreenExit,HIGH);
 
   //Init LDR
   pinMode(ldr,INPUT);
@@ -258,8 +281,11 @@ void loop() {
   
   UltraSonic();
 
-  //TEST PARA VER SI LEE EL VALOR
+  Infrared();
+
+  RGBVisit(0);
+  RGBExit(0);
+  
   int value = analogRead(ldr);
   Serial.println(value);
-  //NOTAS: FALTA EL FUNCIONAMIENTO DE EXIT Y CONECTAR LOS LEDS CON EL LDR;
 }

@@ -216,7 +216,6 @@ void loop() {
 
   RFID();
 
-  //TEST PARA VER SI LEE EL VALOR
   int value = analogRead(ldr);
   if (value <= 250) {
     //Enciende rojo por defecto
