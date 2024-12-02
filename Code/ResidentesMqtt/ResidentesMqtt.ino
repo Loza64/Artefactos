@@ -66,7 +66,7 @@ Servo ServoResident;
 #define ldr A0
 
 //------------------------------------------------RFID Function------------------------------------------------
-void RFID(){
+void RFID() {
   if (rfid.PICC_IsNewCardPresent()) {
     if (rfid.PICC_ReadCardSerial()) {
       String card = "";
@@ -82,13 +82,19 @@ void RFID(){
 }
 
 //------------------------------------------------LED RGB-----------------------------------------------------
-void RGB(int led){
-  if(led!=0){
-    digitalWrite(lRed,HIGH);
-    digitalWrite(lGreen,LOW);
-  }else{
-    digitalWrite(lRed,LOW);
-    digitalWrite(lGreen,HIGH);
+void RGB(int led) {
+  int value = analogRead(ldr);
+  if (value <= 250) {
+    if (led != 0) {
+      digitalWrite(lRed, HIGH);
+      digitalWrite(lGreen, LOW);
+    } else {
+      digitalWrite(lRed, LOW);
+      digitalWrite(lGreen, HIGH);
+    }
+  } else {
+    digitalWrite(lRed, HIGH);
+    digitalWrite(lGreen, HIGH);
   }
 }
 
@@ -96,10 +102,10 @@ void RGB(int led){
 void ResidentDoor(int position) {
   if (position <= 180) {
     ServoResident.write(180);
-    RGB(1); //Enciende VERDE
+    RGB(1);  //Enciende VERDE
     delay(5000);
     ServoResident.write(0);
-    RGB(0); //Enciende ROJO
+    RGB(0);  //Enciende ROJO
   } else {
     Serial.println("Error to move servo");
   }
@@ -165,9 +171,9 @@ void WebDataManage(const char *topic, const String data) {
     }
   }
   if (strcmp(topic, subscriptions[1]) == 0) {
-    if(data == "resident"){
+    if (data == "resident") {
       ResidentDoor(180);
-    } 
+    }
   }
 }
 
@@ -191,14 +197,14 @@ void setup() {
   rfid.PCD_Init();
 
   //Init LEDs
-  pinMode(lRed,OUTPUT);
-  pinMode(lGreen,OUTPUT);
+  pinMode(lRed, OUTPUT);
+  pinMode(lGreen, OUTPUT);
   //LEDs RGB de anodo comun
-  digitalWrite(lRed,LOW); //Enciende el led rojo (por defecto)
-  digitalWrite(lGreen,HIGH); //Apaga el led verde
+  digitalWrite(lRed, HIGH);    //Apaga el led rojo
+  digitalWrite(lGreen, HIGH);  //Apaga el led verde
 
   //Init LDR
-  pinMode(ldr,INPUT);
+  pinMode(ldr, INPUT);
 }
 
 void loop() {
@@ -212,6 +218,14 @@ void loop() {
 
   //TEST PARA VER SI LEE EL VALOR
   int value = analogRead(ldr);
+  if (value <= 250) {
+    //Enciende rojo por defecto
+    digitalWrite(lRed, LOW);
+    digitalWrite(lGreen, HIGH);
+  }else{
+    //Ambos apagados
+    digitalWrite(lRed, HIGH);
+    digitalWrite(lGreen, HIGH);
+  }
   Serial.println(value);
-  //NOTAS: FALTA EL FUNCIONAMIENTO DE EXIT Y CONECTAR LOS LEDS CON EL LDR;
 }
