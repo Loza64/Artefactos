@@ -80,21 +80,21 @@ Servo ServoVisit;
 //------------------------------------------------LEDs RGB-----------------------------------------------------
 void RGBVisit(int led){
   if(led!=0){
-    digitalWrite(lRed,HIGH);
-    digitalWrite(lGreen,LOW);
+    digitalWrite(lRedVisit,HIGH);
+    digitalWrite(lGreenVisit,LOW);
   }else{
-    digitalWrite(lRed,LOW);
-    digitalWrite(lGreen,HIGH);
+    digitalWrite(lRedVisit,LOW);
+    digitalWrite(lGreenVisit,HIGH);
   }
 }
 
 void RGBExit(int led){
   if(led!=0){
-    digitalWrite(lRed,HIGH);
-    digitalWrite(lGreen,LOW);
+    digitalWrite(lRedExit,HIGH);
+    digitalWrite(lGreenExit,LOW);
   }else{
-    digitalWrite(lRed,LOW);
-    digitalWrite(lGreen,HIGH);
+    digitalWrite(lRedExit,LOW);
+    digitalWrite(lGreenExit,HIGH);
   }
 }
 
@@ -256,7 +256,6 @@ void loop() {
   }
   mqttClient.loop();
   
-  RFID();
   UltraSonic();
 
   //TEST PARA VER SI LEE EL VALOR

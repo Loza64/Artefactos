@@ -209,7 +209,6 @@ void loop() {
   mqttClient.loop();
 
   RFID();
-  UltraSonic();
 
   //TEST PARA VER SI LEE EL VALOR
   int value = analogRead(ldr);
